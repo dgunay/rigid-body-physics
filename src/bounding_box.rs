@@ -100,17 +100,6 @@ impl BoundingBox {
             },
         }
     }
-
-    fn distance_to_edge(&self, pos: Coordinate, vec: Vector) -> Vector {
-        // if the vector is negative, find distance from zero.
-        let x_edge = if vec.x > 0.0 { self.width } else { 0.0 };
-        let y_edge = if vec.y > 0.0 { self.height } else { 0.0 };
-
-        Vector {
-            x: x_edge - pos.x,
-            y: y_edge - pos.y,
-        }
-    }
 }
 
 #[cfg(test)]

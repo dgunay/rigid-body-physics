@@ -15,10 +15,16 @@ impl Point {
         mut self,
         bounding_box: &BoundingBox,
         forces: &Vec<Box<dyn Force>>,
+        user_force: Option<&impl Force>,
     ) -> Result<Point> {
         // Apply forces such as gravity
         for f in forces {
             f.apply(&mut self);
+        }
+
+        match user_force {
+            Some(f) => f.apply(&mut self),
+            _ => {}
         }
 
         // If it is the edge of the bounding box, bounce off of it.

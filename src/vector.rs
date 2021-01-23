@@ -1,9 +1,13 @@
 use anyhow::Result;
+use sdl2::keyboard::Scancode;
 use thiserror::Error;
 
-use std::ops::{Add, Mul, Neg, Sub};
+use std::{
+    convert::TryFrom,
+    ops::{Add, Mul, Neg, Sub},
+};
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Default)]
 pub struct Vector {
     pub x: f64,
     pub y: f64,
@@ -13,11 +17,19 @@ pub struct Vector {
 pub enum Error {
     #[error("Attempted to access axis at invalid offset {0}")]
     InvalidAxis(usize),
+
+    #[error("Invalid Scancode {0}")]
+    InvalidScancode(Scancode),
 }
 
 impl Vector {
     pub fn zero() -> Self {
         Self { x: 0.0, y: 0.0 }
+    }
+
+    pub fn zero_out(&mut self) {
+        self.x = 0.0;
+        self.y = 0.0;
     }
 
     /// Accesses the Vector's fields as if they were an array of f64s.
@@ -46,14 +58,14 @@ impl Vector {
     pub fn max(self, limit: f64) -> Self {
         Self {
             x: self.x.max(limit),
-            y: self.x.max(limit),
+            y: self.y.max(limit),
         }
     }
 
     pub fn min(self, limit: f64) -> Self {
         Self {
             x: self.x.min(limit),
-            y: self.x.min(limit),
+            y: self.y.min(limit),
         }
     }
 
@@ -134,5 +146,26 @@ impl Add for Vector {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
         }
+    }
+}
+
+impl TryFrom<Scancode> for Vector {
+    type Error = Error;
+
+    fn try_from(k: Scancode) -> Result<Self, Self::Error> {
+        let mut v = Vector::zero();
+        match k {
+            Scancode::A => v.x = -1.0,
+            Scancode::D => v.x = 1.0,
+            Scancode::S => v.y = 1.0,
+            Scancode::W => v.y = -1.0,
+            Scancode::Left => v.x = -1.0,
+            Scancode::Right => v.x = 1.0,
+            Scancode::Down => v.y = 1.0,
+            Scancode::Up => v.y = -1.0,
+            _ => return Err(Error::InvalidScancode(k).into()),
+        }
+
+        Ok(v)
     }
 }
