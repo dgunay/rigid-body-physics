@@ -4,7 +4,10 @@ use std::time::Duration;
 
 use anyhow::Result;
 use bounding_box::BoundingBox;
-use fixed_point_physics::{bounding_box, coordinate::Coordinate, vector::Vector};
+use fixed_point_physics::{
+    bounding_box, coordinate::Coordinate, drag::Drag, gravity::Gravity, traits::Force,
+    vector::Vector,
+};
 use sdl2::{event::Event, keyboard::Keycode, pixels::Color};
 use thiserror::Error;
 
@@ -56,6 +59,8 @@ fn main() -> Result<()> {
 
     // std::thread::sleep(Duration::new(2, 0));
 
+    let forces: Vec<Box<dyn Force>> = vec![Box::new(Gravity::default()), Box::new(Drag::new(0.98))];
+
     'running: loop {
         for event in event_pump.poll_iter() {
             match event {
@@ -71,7 +76,7 @@ fn main() -> Result<()> {
         }
 
         // Where should the point move to?
-        pt = pt.travel(&bounding_box)?;
+        pt = pt.travel(&bounding_box, &forces)?;
 
         // let (x, y) = pt.position.rounded_as_ints();
 

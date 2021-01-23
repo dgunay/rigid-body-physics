@@ -93,6 +93,17 @@ impl Mul for Vector {
     }
 }
 
+impl Mul<f64> for Vector {
+    type Output = Vector;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self {
+            x: self.x * rhs,
+            y: self.y * rhs,
+        }
+    }
+}
+
 impl Neg for Vector {
     type Output = Vector;
 

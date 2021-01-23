@@ -1,7 +1,7 @@
 use anyhow::Result;
 use sdl2::rect::Rect;
 
-use crate::{bounding_box::BoundingBox, coordinate::Coordinate, vector::Vector};
+use crate::{bounding_box::BoundingBox, coordinate::Coordinate, traits::Force, vector::Vector};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Point {
@@ -11,10 +11,18 @@ pub struct Point {
 
 impl Point {
     // TODO: is it better/more efficient to mutate a Point or return a new one?
-    pub fn travel(self, bounding_box: &BoundingBox) -> Result<Point> {
+    pub fn travel(
+        mut self,
+        bounding_box: &BoundingBox,
+        forces: &Vec<Box<dyn Force>>,
+    ) -> Result<Point> {
+        // Apply forces such as gravity
+        for f in forces {
+            f.apply(&mut self);
+        }
+
         // If it is the edge of the bounding box, bounce off of it.
         // e.g. if we are velocity 3.0, and the edge is 2.0 away, we end up 1.0 from the edge.
-
         bounding_box.bounce(self)
     }
 
@@ -22,11 +30,6 @@ impl Point {
         use std::iter::once;
         once((&mut self.position.x, &mut self.velocity.x))
             .chain(once((&mut self.position.y, &mut self.velocity.y)))
-        // [
-        //     (&mut self.position.x, &mut self.velocity.x),
-        //     (&mut self.position.y, &mut self.velocity.y),
-        // ]
-        // .iter_mut()
     }
 }
 
