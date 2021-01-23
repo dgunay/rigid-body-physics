@@ -40,19 +40,18 @@ fn main() -> Result<()> {
     canvas.clear();
     canvas.present();
     let mut event_pump = sdl_context.event_pump().unwrap();
-    let mut i = 0;
 
     // Create the simulation environment
     let bounding_box = BoundingBox::new(width.into(), height.into())?;
 
-    // This point will bounce around the bounding box according to forces 
+    // This point will bounce around the bounding box according to forces
     // applied to it.
     let mut pt = fixed_point_physics::point::Point {
         position: Coordinate {
             x: (width / 2) as f64,
             y: (height / 2) as f64,
         },
-        velocity: Vector { x: 0.5, y: 0.5 }
+        velocity: Vector { x: 2.0, y: 2.0 },
     };
 
     // std::thread::sleep(Duration::new(2, 0));
@@ -67,24 +66,23 @@ fn main() -> Result<()> {
                 } => break 'running,
                 _ => {
                     // TODO: Apply any changes to the point's momentum/velocity
-
                 }
             }
         }
 
-        // Where should the point move to? 
-        pt = pt.travel(&bounding_box);
+        // Where should the point move to?
+        pt = pt.travel(&bounding_box)?;
+
+        // let (x, y) = pt.position.rounded_as_ints();
 
         // Render the point.
         canvas.set_draw_color(Color::BLACK);
         canvas.clear();
         canvas.set_draw_color(Color::RED);
-        canvas.draw_point(pt.position.rounded_as_ints()).map_err(Sdl2Error::from)?;
-
-        // i = (i + 1) % 255;
-        // canvas.set_draw_color(Color::RGB(i, 64, 255 - i));
-        // // The rest of the game loop goes here...
+        canvas.fill_rect(Some(pt.into())).map_err(Sdl2Error::from)?;
+        // canvas.draw_point((x, y)).map_err(Sdl2Error::from)?;
         canvas.present();
+
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
 

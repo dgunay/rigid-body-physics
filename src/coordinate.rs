@@ -3,7 +3,7 @@ use crate::vector::Vector;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Coordinate {
     pub x: f64,
-    pub y: f64
+    pub y: f64,
 }
 
 impl Coordinate {
@@ -16,7 +16,11 @@ impl Coordinate {
     pub fn add(self, vec: Vector) -> Self {
         Self {
             x: self.x + vec.x,
-            y: self.y + vec.y
+            y: self.y + vec.y,
         }
+    }
+
+    pub fn subtract(self, vec: Vector) -> Self {
+        self.add(-vec)
     }
 }
