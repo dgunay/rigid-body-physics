@@ -73,7 +73,7 @@ fn main() -> Result<()> {
         }
 
         // Where should the point move to? 
-        pt = pt.travel();
+        pt = pt.travel(&bounding_box);
 
         // Render the point.
         canvas.set_draw_color(Color::BLACK);
